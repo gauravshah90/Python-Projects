@@ -1,0 +1,18 @@
+def calc(t, p, nps_rate):
+    total = 0
+    for i in range(t):
+        amount = p*((1+(nps_rate/100))**(t-i))
+        total = total+amount
+    return round(total,0)
+
+n = int(input("what is the duration of investmemt: "))
+p= float(input("what is the principal amount: "))
+nps_rate = float(input("What is the expected rate from NPS (in %): "))
+mf_rate = float(input("What is the expected rate from Mutual Fund: "))
+tax = float(input("what is your current tax slab: "))
+cg= float(input("What is the expected capital gain: "))
+
+nps_value = calc(n,p,nps_rate)
+mf_value = calc(n,p*(1-tax/100),mf_rate)*(1-(cg/100))
+print(f"NPS Amount after {n} years @ {nps_rate} %rate is {nps_value}")
+print(f"MF Amount after {n} years @ {mf_rate} %rate is {mf_value} considering {cg}% Capital Gain tax and {tax}% tax slab")
