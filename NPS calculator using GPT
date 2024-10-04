@@ -1,0 +1,39 @@
+from pydantic import BaseModel
+from openai import OpenAI
+
+text = input("provide the details here")
+
+client = OpenAI()
+
+class calc_values(BaseModel):
+    principal: float
+    rate: float
+    time: int
+
+completion = client.beta.chat.completions.parse(
+    model="gpt-4o-2024-08-06",
+    messages=[
+        {"role": "system", "content": "You are a financial calculator. Extract values from the information that user provides to fill in the details for your calculator. All the values should be converted into Annual for usage. Ignore % sign in rate. Use the value only"},
+        {"role": "user", "content": text},
+    ],
+    response_format=calc_values,
+)
+
+values = completion.choices[0].message.parsed
+n = values.time
+nps_rate = values.rate
+p = values.principal
+
+def calc(t, p, nps_rate):
+    total = 0
+    for i in range(t):
+        amount = p*((1+(nps_rate/100))**(t-i))
+        total = total+amount
+    return round(total,0)
+
+nps_value = calc(n,p,nps_rate)
+print(f"Text provided to model: {text}")
+print(f"NPS Amount after {n} years @ {nps_rate} %rate is {nps_value}")
+print(f"Time considered: {n}")
+print(f"Principal amount considered: {p}")
+print(f"Rate of return from NPS considered: {nps_rate}")
